@@ -25,44 +25,38 @@ d3.queue()
     .defer(d3.json, '../data/gz_2010_us_050_00_5m.json')
     .defer(d3.tsv, '../data/unemployment.tsv', parseData)
     .await(function(err, geo, data){
-        console.log(geo);
-        console.table(data);
-        console.log(rate);
-
-        projection.fitExtent([[0,0],[w,h]],geo);
+        
+        projection
+            .fitExtent([[0,0],[w,h]],geo);
 
         var counties = plot.selectAll('.county')
             .data(geo.features)
             .enter()
-            .append('path')
+            .append('path').attr('class','county')
             .attr('d',path)
-            .style('fill',function(d){
-                //Combine state and county id so we can look up unemployment rate
+            .style('fill', function(d){
                 var id = (+d.properties.STATE) + d.properties.COUNTY;
+                
+                //get
                 var r = rate.get(id);
+                if (!r){ console.log(id)}
+                //use employment rate to 
+                
+                
+                //return that color
                 return scaleColor(r);
-            });
+        });
 
-        //Tooltip
-        counties.on('mouseenter',function(d){
-
-            })
-            .on('mousemove',function(d){
-
-            })
-            .on('mouseleave',function(d){
-
-            });
+        counties.on('click', function(d){
+            console.log(d.properties.STATE + d.properties.COUNTY);
+        });
 
     });
 
 
+
+
+
 function parseData(d){
-
-    rate.set(d.id, +d.rate);
-
-    return {
-        id: d.id,
-        rate:+d.rate
-    }
+    rate.set(d.id, d.rate);
 }
